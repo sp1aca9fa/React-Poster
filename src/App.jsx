@@ -1,4 +1,4 @@
-import Post from "./components/Post";
+import PostsList from "./components/PostsList";
 
 function App() {
   // Xx: the syntax of having html in js files is called jsx and thats why the files are .jsx
@@ -13,9 +13,7 @@ function App() {
   // Xx: if you have elements that have no content between their opening and closing tags, you may write them and close them similar to html or like below (self-closing tag), but you cant just write them without closing.
   return (
     <main>
-      <Post />
-      <Post />
-      <Post />
+      <PostsList />
     </main>
   );
 }
