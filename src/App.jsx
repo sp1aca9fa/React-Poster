@@ -1,4 +1,7 @@
+import { useState } from "react";
+
 import PostsList from "./components/PostsList";
+import MainHeader from "./components/MainHeader";
 
 function App() {
   // Xx: the syntax of having html in js files is called jsx and thats why the files are .jsx
@@ -11,10 +14,28 @@ function App() {
   // Xx: restriction enforced by React: when you have multiple elements or components side by side in the code, it must be wrapped by another component/element
   // Xx: if you dont want to wrap everything in any particular element, you can simply use <></>. this is called the React fragment. It's a special component built in React.
   // Xx: if you have elements that have no content between their opening and closing tags, you may write them and close them similar to html or like below (self-closing tag), but you cant just write them without closing.
+
+  const [modalIsVisible, setModalIsVisible] = useState(false); // Xx: setting useState to hide the modal when we click on the background; set visible to false as standard
+  // Xx: again, using lift state and the event will be get with props from other components down the line
+
+  function showModalHandler() {
+    setModalIsVisible(true);
+  }
+
+  function hideModalHandler() {
+    setModalIsVisible(false);
+  }
+
   return (
-    <main>
-      <PostsList />
-    </main>
+    <>
+      <MainHeader onCreatePost={showModalHandler} />
+      <main>
+        <PostsList
+          isPosting={modalIsVisible}
+          onStopPosting={hideModalHandler}
+        />
+      </main>
+    </>
   );
 }
 

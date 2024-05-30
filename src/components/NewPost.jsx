@@ -1,8 +1,9 @@
+import { useState } from "react";
 import classes from "./NewPost.module.css";
 
 // Xx: because we need to change an element that is not in NewPost, we lifted the state up to PostsList, passed in props from PostsLists to receive the new values and apply when onChange event listener is triggered
 
-function NewPost(props) {
+function NewPost({ onCancel, onAddPost }) {
   // Xx: destructuring useState (assigning the 2 elements of the array that will result from useState to save them to different constants), common practice
   // Xx: it is a convention to generally use the first element of the destructuring of useState as the element we want to update and the function as set-element-we-want-to-update, such as above
 
@@ -13,15 +14,44 @@ function NewPost(props) {
   // Xx: need to call the state updating function passing the new value as a value for the function
   // }
 
+  const [enteredBody, setEnteredBody] = useState("");
+  const [enteredAuthor, setEnteredAuthor] = useState("");
+
+  function bodyChangeHandler(event) {
+    setEnteredBody(event.target.value);
+  }
+
+  function authorChangeHandler(event) {
+    setEnteredAuthor(event.target.value);
+  }
+
+  // Xx: similar to other functions called with an event listener, it gets the properties of the event
+  function submitHandler(event) {
+    event.preventDefault(); // Xx: prevents the browser default of generating and sending an HTTP request
+    // Xx: could add some data checkers here that would update the state in case the data is invalid
+    const postData = {
+      body: enteredBody,
+      author: enteredAuthor,
+    };
+    onAddPost(postData);
+    onCancel(); // Xx: to close the modal after the post is submitted
+  }
+
   return (
-    <form className={classes.form}>
+    <form className={classes.form} onSubmit={submitHandler}>
       <p>
         <label htmlFor="body">Text</label>
-        <textarea id="body" required rows={3} onChange={props.onBodyChange} />
+        <textarea id="body" required rows={3} onChange={bodyChangeHandler} />
       </p>
       <p>
         <label htmlFor="name">Your name</label>
-        <input type="text" id="name" required onChange={props.onAuthorChange} />
+        <input type="text" id="name" required onChange={authorChangeHandler} />
+      </p>
+      <p className={classes.actions}>
+        <button>Submit</button>
+        <button type="button" onClick={onCancel}>
+          Cancel
+        </button>
       </p>
     </form>
   );
@@ -47,5 +77,9 @@ function NewPost(props) {
 // Xx: the first element is current state value; the second element is a state updating function, a function that you can execute to assign a new value to the state
 // Xx: once we call that state updating function React will execute the component function again (thus updating the state)
 // Xx: react hooks compare the snapshots (before and after change) and only change update portions of the code, instead of reloading everything, which would be too performance intensive
+
+// Xx: about the buttons: when buttons are added to a form they automatically have functionality to send the form with HTML request;
+// Xx: first we stop the cancel button by changing its type to 'button', instead of the default 'submit', so it wont submit the form
+// Xx: then we need to stop the html request from the submit button as well, so we can handle the submission with react
 
 export default NewPost;
