@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+
 import classes from "./NewPost.module.css";
+import Modal from "../components/Modal";
 
 // Xx: because we need to change an element that is not in NewPost, we lifted the state up to PostsList, passed in props from PostsLists to receive the new values and apply when onChange event listener is triggered
 
-function NewPost({ onCancel, onAddPost }) {
+function NewPost({ onAddPost }) {
   // Xx: destructuring useState (assigning the 2 elements of the array that will result from useState to save them to different constants), common practice
   // Xx: it is a convention to generally use the first element of the destructuring of useState as the element we want to update and the function as set-element-we-want-to-update, such as above
 
@@ -38,22 +41,29 @@ function NewPost({ onCancel, onAddPost }) {
   }
 
   return (
-    <form className={classes.form} onSubmit={submitHandler}>
-      <p>
-        <label htmlFor="body">Text</label>
-        <textarea id="body" required rows={3} onChange={bodyChangeHandler} />
-      </p>
-      <p>
-        <label htmlFor="name">Your name</label>
-        <input type="text" id="name" required onChange={authorChangeHandler} />
-      </p>
-      <p className={classes.actions}>
-        <button>Submit</button>
-        <button type="button" onClick={onCancel}>
-          Cancel
-        </button>
-      </p>
-    </form>
+    <Modal>
+      <form className={classes.form} onSubmit={submitHandler}>
+        <p>
+          <label htmlFor="body">Text</label>
+          <textarea id="body" required rows={3} onChange={bodyChangeHandler} />
+        </p>
+        <p>
+          <label htmlFor="name">Your name</label>
+          <input
+            type="text"
+            id="name"
+            required
+            onChange={authorChangeHandler}
+          />
+        </p>
+        <p className={classes.actions}>
+          <button>Submit</button>
+          <Link to="/" type="button">
+            Cancel
+          </Link>
+        </p>
+      </form>
+    </Modal>
   );
 }
 

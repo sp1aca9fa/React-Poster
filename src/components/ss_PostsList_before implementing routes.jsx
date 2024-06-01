@@ -1,13 +1,32 @@
 // Xx: while not required, it is considered good practice to put different components into different files
-// import { useState, useEffect } from "react"; // Xx: used in the first implementation of fetching posts, before implementing routes
-
-import { useLoaderData } from "react-router-dom"; // Xx: will be used to get the posts through our loader implemented in main.jsx and Posts.jsx
+import { useState, useEffect } from "react";
 
 import Post from "./Post";
 import classes from "./PostsList.module.css";
 
+// Xx: useState: comments/explanation in NewPost.jsx, as it was originally implemented there
+
 function PostsList() {
-  const posts = useLoaderData();
+  // Xx: cannot use await async directly in functions in React components, because components should not return promises, only jsx, at least as a standard (we could use some react library? to handle it, apparently)
+  const [posts, setPosts] = useState([]);
+  // Xx: useState should be set to an array when the new state depends on the old state
+
+  const [isFetching, setIsFetching] = useState(false); // Xx: display some sort of loading status, so the website doesnt show "there's no posts" while loading data from the server
+
+  // Xx: useEffect is the way to receive data from the backend by updating state and without running into an infinite loop (as we would if we just implemented the fetch without useEffect)
+  // Xx: useEffect takes in a function and an array as values/arguments; the array is to set the dependencies so React can check them and run the function again; if we leave as null, React will not run useEffect again
+  // Xx: did not set the unnamed function as async because useEffect should not take a function that return a promise itself; it should return nothing or a cleanup function
+  useEffect(() => {
+    async function fetchPosts() {
+      setIsFetching(true);
+      const response = await fetch("http://localhost:8080/posts");
+      const resData = await response.json();
+      setPosts(resData.posts);
+      setIsFetching(false);
+    }
+
+    fetchPosts();
+  }, []);
 
   function addPostHandler(postData) {
     fetch("http://localhost:8080/posts", {
@@ -30,7 +49,7 @@ function PostsList() {
 
   return (
     <>
-      {posts.length > 0 && (
+      {!isFetching && posts.length > 0 && (
         <ul className={classes.posts}>
           {posts.map((post) => (
             <Post
@@ -41,10 +60,15 @@ function PostsList() {
           ))}
         </ul>
       )}
-      {posts.length === 0 && (
+      {!isFetching && posts.length === 0 && (
         <div style={{ textAlign: "center", color: "white" }}>
           <h2>There are no posts yet.</h2>
           <p>Start adding some!</p>
+        </div>
+      )}
+      {isFetching && (
+        <div style={{ textAlign: "center", color: "white" }}>
+          <p>Loading posts...</p>
         </div>
       )}
     </>

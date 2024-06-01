@@ -1,10 +1,21 @@
+import { useNavigate } from "react-router-dom"; // Xx: used to navigate to the starting page once pressing cancel button
+
 import classes from "./Modal.module.css";
 
-function Modal({ children, onClose }) {
+function Modal({ children }) {
   // Xx: curly braces is destructuring of props
+
+  const navigate = useNavigate();
+  // Xx: useNavigate is used to enable this navigate function
+
+  function closeHandler() {
+    navigate("/");
+    // navigate('..') Xx: this works too, navigates to one level above
+  }
+
   return (
     <>
-      <div className={classes.backdrop} onClick={onClose} />
+      <div className={classes.backdrop} onClick={closeHandler} />
       <dialog open className={classes.modal}>
         {children}
       </dialog>
