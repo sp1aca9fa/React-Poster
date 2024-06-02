@@ -3,9 +3,11 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import Posts, { loader as postsLoader } from "./routes/Posts";
-import NewPost from "./routes/NewPost";
+import NewPost, { action as newPostAction } from "./routes/NewPost";
+import PostDetails, { loader as postDetailsLoader } from "./routes/PostDetails";
 import RootLayout from "./routes/RootLayout";
 import "./index.css";
+import Post from "./components/Post";
 // Xx: importing a css file would normally not work in the browser, but it is a newer feature and is transformed under the hood.
 
 // Xx: setting up a router: 1- import RouterProvider and createBroswerRouter from react-router-dom
@@ -24,11 +26,19 @@ const router = createBrowserRouter([
         path: "/",
         element: <Posts />,
         loader: postsLoader,
-        children: [{ path: "/create-post", element: <NewPost /> }],
+        children: [
+          { path: "/create-post", element: <NewPost />, action: newPostAction },
+          { path: "/:id", element: <PostDetails />, loader: postDetailsLoader },
+        ],
       },
     ],
   },
 ]);
+
+// Xx: about "action": if we use Form from React instead of HTML form, React will execute the function passed through the action property
+// Xx: newPostAction is the action function being imported from NewPost.jsx and basically it sends the fetch request to submit the form
+// Xx: to make it all work, we also added the "name" property to each of the forms fields, so these will be assimilated with the properties in the backend
+// Xx: we also added a "method='post'" to the Form, so React will generate a request object with that form data and it will give this object a method which we could use to find out which form was submitted, in case we have various forms being submitted by the same route with the same action
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   // Xx: this gets the element with root id from the HTML and renders the react code below

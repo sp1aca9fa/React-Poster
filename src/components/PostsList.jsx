@@ -9,32 +9,14 @@ import classes from "./PostsList.module.css";
 function PostsList() {
   const posts = useLoaderData();
 
-  function addPostHandler(postData) {
-    fetch("http://localhost:8080/posts", {
-      method: "POST",
-      body: JSON.stringify(postData),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }); // Xx: js function to handle HTTP requests, can be used to fetch and also send http requests
-    // Xx: this is what sends the request to the backend api
-
-    // Xx: adds the new post as the first post and shows the previous posts
-    // setPosts([postData, ...posts]);
-    // Xx: general rule using states, if shouldng use existing posts as the above, we cant do just "...posts", we should actually pass a function to setPosts
-    setPosts((existingPosts) => [postData, ...existingPosts]);
-    // Xx: the function will automatically receive the current state snapsnot so the existing posts and we return a new state value, adding the new post data and the previous posts
-    // Xx: its similar to the previous code, but it is the suggested approach if the function depends on the previous state snapshot
-    // Xx: the reason is react does not execute state updating functions instantly, it schedules these state updates; in case you have multiple state updates, you could potentially update state with an old state.
-  }
-
   return (
     <>
       {posts.length > 0 && (
         <ul className={classes.posts}>
           {posts.map((post) => (
             <Post
-              key={crypto.randomUUID()}
+              key={post.id}
+              id={post.id}
               author={post.author}
               body={post.body}
             />

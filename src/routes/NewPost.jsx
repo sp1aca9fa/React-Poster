@@ -1,60 +1,21 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Form, redirect } from "react-router-dom";
 
 import classes from "./NewPost.module.css";
 import Modal from "../components/Modal";
 
 // Xx: because we need to change an element that is not in NewPost, we lifted the state up to PostsList, passed in props from PostsLists to receive the new values and apply when onChange event listener is triggered
 
-function NewPost({ onAddPost }) {
-  // Xx: destructuring useState (assigning the 2 elements of the array that will result from useState to save them to different constants), common practice
-  // Xx: it is a convention to generally use the first element of the destructuring of useState as the element we want to update and the function as set-element-we-want-to-update, such as above
-
-  // function changeBodyHandler(event) {
-  // Xx: Max suggests using handler at the end of the name of the function if we plan to assign it to an event listener
-  // Xx: we will automatically get an event object when using addeventlistener, including info such as the event target (in this case, the textarea) and the value
-  // setEnteredBody(event.target.value);
-  // Xx: need to call the state updating function passing the new value as a value for the function
-  // }
-
-  const [enteredBody, setEnteredBody] = useState("");
-  const [enteredAuthor, setEnteredAuthor] = useState("");
-
-  function bodyChangeHandler(event) {
-    setEnteredBody(event.target.value);
-  }
-
-  function authorChangeHandler(event) {
-    setEnteredAuthor(event.target.value);
-  }
-
-  // Xx: similar to other functions called with an event listener, it gets the properties of the event
-  function submitHandler(event) {
-    event.preventDefault(); // Xx: prevents the browser default of generating and sending an HTTP request
-    // Xx: could add some data checkers here that would update the state in case the data is invalid
-    const postData = {
-      body: enteredBody,
-      author: enteredAuthor,
-    };
-    onAddPost(postData);
-    onCancel(); // Xx: to close the modal after the post is submitted
-  }
-
+function NewPost() {
   return (
     <Modal>
-      <form className={classes.form} onSubmit={submitHandler}>
+      <Form method="post" className={classes.form}>
         <p>
           <label htmlFor="body">Text</label>
-          <textarea id="body" required rows={3} onChange={bodyChangeHandler} />
+          <textarea id="body" name="body" required rows={3} />
         </p>
         <p>
           <label htmlFor="name">Your name</label>
-          <input
-            type="text"
-            id="name"
-            required
-            onChange={authorChangeHandler}
-          />
+          <input type="text" id="name" name="author" required />
         </p>
         <p className={classes.actions}>
           <button>Submit</button>
@@ -62,7 +23,7 @@ function NewPost({ onAddPost }) {
             Cancel
           </Link>
         </p>
-      </form>
+      </Form>
     </Modal>
   );
 }
@@ -93,3 +54,19 @@ function NewPost({ onAddPost }) {
 // Xx: then we need to stop the html request from the submit button as well, so we can handle the submission with react
 
 export default NewPost;
+
+export async function action({ request }) {
+  // Xx: destructuring of the data object automatically received when running this function
+  const formData = await request.formData();
+  const postData = Object.fromEntries(formData); // {body: '...', author: '...'}
+  const response = await fetch("http://localhost:8080/posts", {
+    method: "POST",
+    body: JSON.stringify(postData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  // Xx: const response may be used to handle errors; not implemented; may also simply remove "const response" from above and just await fetch
+
+  return redirect("/");
+}
